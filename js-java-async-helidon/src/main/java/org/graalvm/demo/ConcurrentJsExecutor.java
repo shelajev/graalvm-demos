@@ -42,6 +42,9 @@ package org.graalvm.demo;
 
 import org.graalvm.polyglot.*;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.locks.Lock;
@@ -91,8 +94,18 @@ class ConcurrentJsExecutor {
         /*
          * For simplicity, allow ALL accesses. In a real application, access to resources should be restricted.
          */
-        Context cx = Context.newBuilder(JS).allowHostAccess(HostAccess.ALL).allowPolyglotAccess(PolyglotAccess.ALL)
+        Map<String, String> options = new HashMap<>();
+        options.put("js.commonjs-require", "true");
+        options.put("js.commonjs-require-cwd", new File(".").getAbsolutePath());
+
+        Context cx = Context.newBuilder(JS)
+                .allowAllAccess(true)
+                .allowExperimentalOptions(true)
+                .options(options)
                 .engine(sharedEngine).build();
+
+        // import lodash (example npm module)
+        cx.eval("js", "const _ = require('lodash');");
         /*
          * Register a Java method in the Context global scope as a JavaScript function.
          */

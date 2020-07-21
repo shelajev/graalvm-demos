@@ -62,7 +62,9 @@ class HelidonService {
     private static final String jsCode = "(async function(requestId) {"
             + "  try {"
             + "    let data = await computeFromJava(requestId);"
-            + "    return JSON.stringify({requestId: requestId, result: data});"
+            // here we compute something using lodash installed as an npm module
+            + "    let a = _.partition([requestId, 2, data, 4], n => n % 2);"
+            + "    return JSON.stringify({requestId: requestId, result: data, lodashworks: a});"
             + "  } catch (e) {"
             + "    return 'There was an error in JS-land! ' + e;"
             + "  }"
